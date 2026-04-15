@@ -1,0 +1,108 @@
+{
+  "name": "Wardrobe",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "tops",
+        "bottoms",
+        "dresses",
+        "outerwear",
+        "shoes",
+        "jewelry",
+        "bags",
+        "swimwear"
+      ]
+    },
+    "color": {
+      "type": "string"
+    },
+    "fabric": {
+      "type": "string"
+    },
+    "pattern": {
+      "type": "string",
+      "enum": [
+        "plain",
+        "striped",
+        "floral",
+        "checked",
+        "printed",
+        "textured",
+        "other"
+      ]
+    },
+    "style_vibe": {
+      "type": "string",
+      "enum": [
+        "casual",
+        "formal",
+        "sporty",
+        "boho",
+        "elegant",
+        "trendy",
+        "minimal",
+        "feminine"
+      ]
+    },
+    "occasions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "office",
+          "college",
+          "party",
+          "beach",
+          "wedding",
+          "casual",
+          "date",
+          "brunch"
+        ]
+      }
+    },
+    "seasons": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "winter",
+          "rainy",
+          "summer_regular",
+          "summer_beachy",
+          "spring",
+          "fall"
+        ]
+      }
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "category",
+    "image_url"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "created_by": "{{user.email}}"
+    },
+    "update": {
+      "created_by": "{{user.email}}"
+    },
+    "delete": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}

@@ -1,0 +1,238 @@
+import { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2, Save } from 'lucide-react';
+
+const skinTones = [
+  { value: 'fair', label: 'Fair', color: '#FDEBD0' },
+  { value: 'light', label: 'Light', color: '#F5CBA7' },
+  { value: 'medium', label: 'Medium', color: '#E0AC69' },
+  { value: 'olive', label: 'Olive', color: '#C68642' },
+  { value: 'tan', label: 'Tan', color: '#8D5524' },
+  { value: 'deep', label: 'Deep', color: '#5C3317' },
+];
+
+const faceShapes = ['oval', 'round', 'square', 'heart', 'oblong', 'diamond'];
+const bodyTypes = ['hourglass', 'pear', 'apple', 'rectangle', 'inverted_triangle', 'athletic'];
+const hairTypes = ['straight', 'wavy', 'curly', 'coily'];
+const hairLengths = ['short', 'medium', 'long', 'very_long'];
+const genders = ['female', 'male', 'non_binary'];
+
+export default function ProfileForm({ profile, onSave, saving }) {
+  const [form, setForm] = useState({
+    name: profile?.name || '',
+    gender: profile?.gender || '',
+    skin_tone: profile?.skin_tone || '',
+    face_shape: profile?.face_shape || '',
+    body_type: profile?.body_type || '',
+    hair_type: profile?.hair_type || '',
+    hair_length: profile?.hair_length || '',
+    hair_color: profile?.hair_color || '',
+    height_cm: profile?.height_cm || '',
+    chest_inches: profile?.chest_inches || '',
+    waist_inches: profile?.waist_inches || '',
+    hip_inches: profile?.hip_inches || '',
+    preferred_colors: profile?.preferred_colors || '',
+    style_preference: profile?.style_preference || '',
+  });
+
+  const update = (key, value) => setForm(prev => ({ ...prev, [key]: value }));
+
+  return (
+    <div className="space-y-8">
+      {/* Name + Gender */}
+      <div className="space-y-3">
+        <h3 className="font-display text-lg font-medium">About You</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Your Name</Label>
+            <Input
+              placeholder="Amyuktha"
+              value={form.name}
+              onChange={e => update('name', e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Gender</Label>
+            <Select value={form.gender} onValueChange={v => update('gender', v)}>
+              <SelectTrigger><SelectValue placeholder="Select gender" /></SelectTrigger>
+              <SelectContent>
+                {genders.map(g => (
+                  <SelectItem key={g} value={g}>{g.replace('_', ' ')}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Height (cm)</Label>
+            <Input
+              type="number"
+              placeholder="165"
+              value={form.height_cm}
+              onChange={e => update('height_cm', e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Skin Tone */}
+      <div className="space-y-3">
+        <h3 className="font-display text-lg font-medium">Skin Tone</h3>
+        <div className="flex flex-wrap gap-3">
+          {skinTones.map(tone => (
+            <button
+              key={tone.value}
+              onClick={() => update('skin_tone', tone.value)}
+              className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200 ${
+                form.skin_tone === tone.value
+                  ? 'border-primary shadow-md scale-105'
+                  : 'border-transparent hover:border-border'
+              }`}
+            >
+              <div
+                className="w-10 h-10 rounded-full shadow-inner border border-black/10"
+                style={{ backgroundColor: tone.color }}
+              />
+              <span className="text-xs font-medium">{tone.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Face & Body */}
+      <div className="space-y-3">
+        <h3 className="font-display text-lg font-medium">Face & Body</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Face Shape</Label>
+            <Select value={form.face_shape} onValueChange={v => update('face_shape', v)}>
+              <SelectTrigger><SelectValue placeholder="Select face shape" /></SelectTrigger>
+              <SelectContent>
+                {faceShapes.map(s => (
+                  <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Body Type</Label>
+            <Select value={form.body_type} onValueChange={v => update('body_type', v)}>
+              <SelectTrigger><SelectValue placeholder="Select body type" /></SelectTrigger>
+              <SelectContent>
+                {bodyTypes.map(b => (
+                  <SelectItem key={b} value={b} className="capitalize">{b.replace('_', ' ')}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+
+      {/* Measurements */}
+      <div className="space-y-3">
+        <h3 className="font-display text-lg font-medium">Measurements (inches)</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Chest</Label>
+            <Input
+              type="number"
+              placeholder="36"
+              value={form.chest_inches}
+              onChange={e => update('chest_inches', e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Waist</Label>
+            <Input
+              type="number"
+              placeholder="28"
+              value={form.waist_inches}
+              onChange={e => update('waist_inches', e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Hip</Label>
+            <Input
+              type="number"
+              placeholder="38"
+              value={form.hip_inches}
+              onChange={e => update('hip_inches', e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Hair */}
+      <div className="space-y-3">
+        <h3 className="font-display text-lg font-medium">Hair</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Hair Type</Label>
+            <Select value={form.hair_type} onValueChange={v => update('hair_type', v)}>
+              <SelectTrigger><SelectValue placeholder="Select hair type" /></SelectTrigger>
+              <SelectContent>
+                {hairTypes.map(h => (
+                  <SelectItem key={h} value={h} className="capitalize">{h}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Hair Length</Label>
+            <Select value={form.hair_length} onValueChange={v => update('hair_length', v)}>
+              <SelectTrigger><SelectValue placeholder="Select length" /></SelectTrigger>
+              <SelectContent>
+                {hairLengths.map(h => (
+                  <SelectItem key={h} value={h} className="capitalize">{h.replace('_', ' ')}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Hair Color</Label>
+            <Input
+              placeholder="Black, brown, blonde..."
+              value={form.hair_color}
+              onChange={e => update('hair_color', e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Style Preferences */}
+      <div className="space-y-3">
+        <h3 className="font-display text-lg font-medium">Style Preferences</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Preferred Colors</Label>
+            <Input
+              placeholder="Black, navy, earth tones..."
+              value={form.preferred_colors}
+              onChange={e => update('preferred_colors', e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Style Vibe</Label>
+            <Input
+              placeholder="Minimal, boho, classic..."
+              value={form.style_preference}
+              onChange={e => update('style_preference', e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+
+      <Button
+        onClick={() => onSave(form)}
+        disabled={saving}
+        className="w-full sm:w-auto gap-2"
+        size="lg"
+      >
+        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+        Save Profile
+      </Button>
+    </div>
+  );
+}

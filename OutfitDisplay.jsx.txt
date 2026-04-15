@@ -1,0 +1,112 @@
+import { motion } from 'framer-motion';
+import { Shirt, Footprints, Gem, Scissors, Lightbulb, Palette } from 'lucide-react';
+
+const OutfitRow = ({ icon: Icon, label, value }) => {
+  if (!value) return null;
+  return (
+    <div className="flex items-start gap-3 py-3 border-b border-border/40 last:border-0">
+      <div className="mt-0.5 p-2 rounded-lg bg-secondary text-accent">
+        <Icon className="w-4 h-4" />
+      </div>
+      <div>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-0.5">{label}</p>
+        <p className="text-sm text-foreground leading-relaxed">{value}</p>
+      </div>
+    </div>
+  );
+};
+
+const VisualCard = ({ emoji, label, value }) => {
+  if (!value) return null;
+  return (
+    <div className="bg-card rounded-xl border border-border/50 p-4 flex flex-col items-center text-center gap-2">
+      <div className="text-3xl">{emoji}</div>
+      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{label}</p>
+      <p className="text-sm text-foreground leading-relaxed">{value}</p>
+    </div>
+  );
+};
+
+export default function OutfitDisplay({ outfit }) {
+  if (!outfit) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-5"
+    >
+      {/* Summary */}
+      {outfit.outfit_description && (
+        <div className="bg-primary/5 border border-primary/10 rounded-2xl p-5">
+          <p className="font-display text-base text-foreground leading-relaxed italic">
+            "{outfit.outfit_description}"
+          </p>
+        </div>
+      )}
+
+      {/* Mannequin + Outfit Breakdown side by side */}
+      <div className="flex flex-col md:flex-row gap-5">
+        {/* Mannequin image */}
+        {outfit.mannequin_image_url && (
+          <div className="md:w-56 shrink-0">
+            <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
+              <div className="px-4 pt-4 pb-2 border-b border-border/50">
+                <h3 className="font-display text-sm font-semibold text-center">Your Look</h3>
+              </div>
+              <img
+                src={outfit.mannequin_image_url}
+                alt="Outfit on mannequin"
+                className="w-full object-cover"
+                style={{ maxHeight: '380px' }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Outfit pieces */}
+        <div className="flex-1">
+          <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden h-full">
+            <div className="px-5 py-4 border-b border-border/50">
+              <h3 className="font-display text-base font-semibold">Outfit Breakdown</h3>
+            </div>
+            <div className="px-5">
+              <OutfitRow icon={Shirt} label="Top" value={outfit.top} />
+              <OutfitRow icon={Shirt} label="Bottom / Dress" value={outfit.bottom} />
+              <OutfitRow icon={Footprints} label="Shoes" value={outfit.shoes} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Visual cards for Jewelry & Hairstyle */}
+      <div className="grid grid-cols-2 gap-4">
+        <VisualCard emoji="💍" label="Jewelry & Accessories" value={outfit.jewelry} />
+        <VisualCard emoji="💇‍♀️" label="Hairstyle" value={outfit.hairstyle} />
+      </div>
+
+      {/* Color palette */}
+      {outfit.color_palette && (
+        <div className="bg-card rounded-2xl border border-border/50 shadow-sm p-5">
+          <div className="flex items-center gap-2 mb-2">
+            <Palette className="w-4 h-4 text-accent" />
+            <h4 className="font-display text-sm font-semibold">Color Palette</h4>
+          </div>
+          <p className="text-sm text-muted-foreground">{outfit.color_palette}</p>
+        </div>
+      )}
+
+      {/* Styling tip */}
+      {outfit.styling_tip && (
+        <div className="bg-amber-50 border border-amber-200/60 rounded-2xl p-5 flex gap-3">
+          <Lightbulb className="w-5 h-5 text-amber-500 mt-0.5 shrink-0" />
+          <div>
+            <p className="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-1">Styling Tip</p>
+            <p className="text-sm text-amber-900 leading-relaxed">{outfit.styling_tip}</p>
+          </div>
+        </div>
+      )}
+    </motion.div>
+  );
+}

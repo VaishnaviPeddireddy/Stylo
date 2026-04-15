@@ -1,0 +1,95 @@
+import { Outlet, Link, useLocation } from 'react-router-dom';
+import { User, Shirt, Sun, Sparkles, Menu, X } from 'lucide-react';
+import { useState } from 'react';
+
+const navItems = [
+  { path: '/profile', label: 'Profile', icon: User },
+  { path: '/', label: 'Seasons', icon: Sun },
+  { path: '/wardrobe', label: 'Wardrobe', icon: Shirt },
+  { path: '/outfits', label: 'My Outfits', icon: Sparkles },
+];
+
+export default function Layout() {
+  const location = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  return (
+    <div className="min-h-screen bg-background font-body">
+      {/* Top bar */}
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border/50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+          <Link to="/" className="flex items-center gap-2">
+            <span className="font-display text-xl font-semibold tracking-tight text-foreground">
+              Stylo
+            </span>
+            <span className="text-xs font-body text-muted-foreground tracking-widest uppercase">
+              fashion
+            </span>
+          </Link>
+
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-1">
+            {navItems.map(item => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Mobile toggle */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="md:hidden p-2 rounded-lg hover:bg-secondary transition-colors"
+          >
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+
+        {/* Mobile nav */}
+        {mobileOpen && (
+          <div className="md:hidden border-t border-border/50 bg-background/95 backdrop-blur-xl">
+            <nav className="flex flex-col p-3 gap-1">
+              {navItems.map(item => {
+                const Icon = item.icon;
+                const isActive = location.pathname === item.path;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                      isActive
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        )}
+      </header>
+
+      {/* Page content */}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+        <Outlet />
+      </main>
+    </div>
+  );
+}

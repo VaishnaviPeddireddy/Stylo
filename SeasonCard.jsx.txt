@@ -1,0 +1,81 @@
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+
+const seasonData = {
+  winter: {
+    emoji: '❄️',
+    gradient: 'from-slate-200 to-blue-100',
+    description: 'Cozy layers, warm tones & elegant textures',
+    image: 'https://images.unsplash.com/photo-1491002052546-bf38f186af56?w=600&q=80',
+  },
+  rainy: {
+    emoji: '🌧️',
+    gradient: 'from-gray-200 to-teal-100',
+    description: 'Waterproof chic with functional style',
+    image: 'https://images.unsplash.com/photo-1428592953211-077101b2021b?w=600&q=80',
+  },
+  summer_regular: {
+    emoji: '☀️',
+    gradient: 'from-amber-100 to-yellow-50',
+    description: 'Light fabrics, bright colors & effortless looks',
+    image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&q=80',
+  },
+  summer_beachy: {
+    emoji: '🏖️',
+    gradient: 'from-cyan-100 to-blue-50',
+    description: 'Resort wear, swimsuits & beach-ready outfits',
+    image: 'https://images.unsplash.com/photo-1473116763249-2faaef81ccda?w=600&q=80',
+  },
+  spring: {
+    emoji: '🌸',
+    gradient: 'from-pink-100 to-rose-50',
+    description: 'Florals, pastels & fresh transitional pieces',
+    image: 'https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=600&q=80',
+  },
+  fall: {
+    emoji: '🍂',
+    gradient: 'from-orange-100 to-amber-50',
+    description: 'Rich tones, layered textures & warm knits',
+    image: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=600&q=80',
+  },
+};
+
+export default function SeasonCard({ season, index }) {
+  const data = seasonData[season];
+  const label = season.replace('_', ' ');
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.08, duration: 0.4 }}
+    >
+      <Link
+        to={`/season/${season}`}
+        className="group block overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm hover:shadow-xl transition-all duration-500"
+      >
+        <div className="relative h-48 sm:h-56 overflow-hidden">
+          <img
+            src={data.image}
+            alt={label}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          <div className="absolute bottom-4 left-4 right-4">
+            <span className="text-3xl mb-1 block">{data.emoji}</span>
+            <h3 className="font-display text-xl font-semibold text-white capitalize">
+              {label}
+            </h3>
+          </div>
+        </div>
+        <div className="p-4">
+          <p className="text-sm text-muted-foreground leading-relaxed">{data.description}</p>
+          <div className="mt-3 flex items-center gap-2 text-sm font-medium text-primary">
+            <span>Explore styles</span>
+            <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  );
+}

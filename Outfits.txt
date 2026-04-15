@@ -1,0 +1,68 @@
+{
+  "name": "Outfit",
+  "type": "object",
+  "properties": {
+    "season": {
+      "type": "string",
+      "enum": [
+        "winter",
+        "rainy",
+        "summer_regular",
+        "summer_beachy",
+        "spring",
+        "fall"
+      ]
+    },
+    "occasion": {
+      "type": "string"
+    },
+    "vibe": {
+      "type": "string"
+    },
+    "top": {
+      "type": "string"
+    },
+    "bottom": {
+      "type": "string"
+    },
+    "shoes": {
+      "type": "string"
+    },
+    "jewelry": {
+      "type": "string"
+    },
+    "hairstyle": {
+      "type": "string"
+    },
+    "styling_tip": {
+      "type": "string"
+    },
+    "color_palette": {
+      "type": "string"
+    },
+    "outfit_description": {
+      "type": "string"
+    },
+    "mannequin_image_url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "season",
+    "outfit_description"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "created_by": "{{user.email}}"
+    },
+    "update": {
+      "created_by": "{{user.email}}"
+    },
+    "delete": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}

@@ -1,0 +1,194 @@
+import { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Loader2, Plus, Upload } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
+
+const categories = ['tops', 'bottoms', 'dresses', 'outerwear', 'shoes', 'jewelry', 'bags', 'swimwear'];
+const patterns = ['plain', 'striped', 'floral', 'checked', 'printed', 'textured', 'other'];
+const styleVibes = ['casual', 'formal', 'sporty', 'boho', 'elegant', 'trendy', 'minimal', 'feminine'];
+const seasonOptions = [
+  { value: 'winter', label: '❄️ Winter' },
+  { value: 'rainy', label: '🌧️ Rainy' },
+  { value: 'summer_regular', label: '☀️ Summer' },
+  { value: 'summer_beachy', label: '🏖️ Beach' },
+  { value: 'spring', label: '🌸 Spring' },
+  { value: 'fall', label: '🍂 Fall' },
+];
+const occasionOptions = [
+  { value: 'office', label: 'Office' },
+  { value: 'college', label: 'College' },
+  { value: 'party', label: 'Party' },
+  { value: 'beach', label: 'Beach' },
+  { value: 'wedding', label: 'Wedding' },
+  { value: 'casual', label: 'Casual' },
+  { value: 'date', label: 'Date' },
+  { value: 'brunch', label: 'Brunch' },
+];
+
+export default function ClothingUploader({ onAdded }) {
+  const [open, setOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
+  const [form, setForm] = useState({
+    name: '',
+    category: '',
+    color: '',
+    fabric: '',
+    pattern: '',
+    style_vibe: '',
+    seasons: [],
+    occasions: [],
+    notes: '',
+  });
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    setImageUrl(file_url);
+    setUploading(false);
+  };
+
+  const toggle = (key, val) => {
+    setForm(prev => ({
+      ...prev,
+      [key]: prev[key].includes(val)
+        ? prev[key].filter(s => s !== val)
+        : [...prev[key], val],
+    }));
+  };
+
+  const handleSave = async () => {
+    if (!form.name || !form.category || !imageUrl) return;
+    setSaving(true);
+    await base44.entities.Wardrobe.create({ ...form, image_url: imageUrl });
+    setSaving(false);
+    setOpen(false);
+    setForm({ name: '', category: '', color: '', fabric: '', pattern: '', style_vibe: '', seasons: [], occasions: [], notes: '' });
+    setImageUrl('');
+    onAdded?.();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className="gap-2"><Plus className="w-4 h-4" />Add Clothing</Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="font-display text-xl">Add to Wardrobe</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-5 pt-2">
+
+          {/* Image */}
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Photo *</Label>
+            {imageUrl ? (
+              <div className="relative rounded-xl overflow-hidden aspect-square max-w-[180px]">
+                <img src={imageUrl} alt="Clothing" className="w-full h-full object-cover" />
+                <button onClick={() => setImageUrl('')}
+                  className="absolute top-2 right-2 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">×</button>
+              </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center h-36 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary/50 transition-colors">
+                {uploading
+                  ? <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                  : <><Upload className="w-7 h-7 text-muted-foreground mb-2" /><span className="text-sm text-muted-foreground">Click to upload</span></>
+                }
+                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+              </label>
+            )}
+          </div>
+
+          {/* Name */}
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Name *</Label>
+            <Input placeholder="White linen top" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
+          </div>
+
+          {/* Category */}
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Category *</Label>
+            <Select value={form.category} onValueChange={v => setForm(p => ({ ...p, category: v }))}>
+              <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+              <SelectContent>
+                {categories.map(c => <SelectItem key={c} value={c} className="capitalize">{c}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Color + Fabric */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">Color</Label>
+              <Input placeholder="Beige, black..." value={form.color} onChange={e => setForm(p => ({ ...p, color: e.target.value }))} />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">Fabric</Label>
+              <Input placeholder="Cotton, linen..." value={form.fabric} onChange={e => setForm(p => ({ ...p, fabric: e.target.value }))} />
+            </div>
+          </div>
+
+          {/* Pattern + Style Vibe */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">Pattern</Label>
+              <Select value={form.pattern} onValueChange={v => setForm(p => ({ ...p, pattern: v }))}>
+                <SelectTrigger><SelectValue placeholder="Pattern" /></SelectTrigger>
+                <SelectContent>
+                  {patterns.map(p => <SelectItem key={p} value={p} className="capitalize">{p}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">Style Vibe</Label>
+              <Select value={form.style_vibe} onValueChange={v => setForm(p => ({ ...p, style_vibe: v }))}>
+                <SelectTrigger><SelectValue placeholder="Vibe" /></SelectTrigger>
+                <SelectContent>
+                  {styleVibes.map(s => <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Seasons */}
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Suitable Seasons</Label>
+            <div className="flex flex-wrap gap-2">
+              {seasonOptions.map(s => (
+                <button key={s.value} onClick={() => toggle('seasons', s.value)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                    form.seasons.includes(s.value) ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-secondary-foreground border-border'
+                  }`}>{s.label}</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Occasions */}
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Occasions</Label>
+            <div className="flex flex-wrap gap-2">
+              {occasionOptions.map(o => (
+                <button key={o.value} onClick={() => toggle('occasions', o.value)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                    form.occasions.includes(o.value) ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-secondary-foreground border-border'
+                  }`}>{o.label}</button>
+              ))}
+            </div>
+          </div>
+
+          <Button onClick={handleSave} disabled={saving || uploading || !form.name || !form.category || !imageUrl} className="w-full gap-2">
+            {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+            Save to Wardrobe
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
